@@ -1,0 +1,4 @@
+future==0.16.0
+hdrhistogram==0.5.2
+mapr-streams-python==0.9.2
+pbr==3.1.1
