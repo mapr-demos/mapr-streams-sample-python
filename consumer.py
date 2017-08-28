@@ -3,28 +3,6 @@ from mapr_streams_python import Consumer, KafkaError
 import json
 import time
 from hdrh.histogram import HdrHistogram
-import signal
-import sys
-
-c = None  # Variable for Consumer
-
-def close_consumer():
-    # Attempt to run .close() on the Consumer and then exit program
-    try:
-        c.close()
-        print("Done!")
-        sys.exit(0)
-    except Exception as e:
-        value = True  # do nothing
-
-
-def signal_handler(signal, frame):
-    # Capture Ctrl+C (SIGINT) since this program is in a near-infinite loop
-    print("You pressed Ctrl+C. Closing Consumer gracefully.")
-    close_consumer()
-
-# Register that we're capturing SIGINT
-signal.signal(signal.SIGINT, signal_handler)
 
 # Variables identfiying name of streams and topics
 TOPIC_FAST_MESSAGES = "/sample-stream:fast-messages";
@@ -46,57 +24,62 @@ stats_all = HdrHistogram(1, 10000000, 3)
 timeouts = 0
 records = 0
 running = True
-while running:
-    msg = c.poll(timeout=0.200)
-    if msg is None:
-        timeouts += 1
-        continue
-    if not msg.error():
-        records += 1
-        print("Got {records} records after {timeouts} timeouts".format(records=records, timeouts=timeouts))
-        timeouts = 0
-        records = 0
+try:
+    while running:
+        msg = c.poll(timeout=0.200)
+        if msg is None:
+            timeouts += 1
+            continue
+        if not msg.error():
+            records += 1
+            print("Got {records} records after {timeouts} timeouts".format(records=records, timeouts=timeouts))
+            timeouts = 0
+            records = 0
 
-        # msg_value is expected in this format:
-        # {'k': 0, 't': '1.503', 'type': 'test'}
-        # Note that we do not explicitly call .decode('utf-8') on msg.value() because json.loads expects the intput
-        # to already be encoded (as of Python 3.6)
-        msg_value = json.loads(msg.value())
+            # msg_value is expected in this format:
+            # {'k': 0, 't': '1.503', 'type': 'test'}
+            # Note that we do not explicitly call .decode('utf-8') on msg.value() because json.loads expects the intput
+            # to already be encoded (as of Python 3.6)
+            msg_value = json.loads(msg.value())
 
-        if msg.topic() == TOPIC_FAST_MESSAGES:
-            # the send time is encoded in side the message
-            if msg_value.get('type', '') == "test":
-                latency = float("%.3f" % time.time()) - msg_value.get('t', 0)
-                stats_periodic.record_value(latency)
-                stats_all.record_value(latency)
-            elif msg_value.get('type', '') == "marker":
-                # whenever we get a marker message, we should dump out the stats
-                # note that the number of fast messages won't necessarily be quite constant
-                print(
-                    "{numbermsgs} messages received in period, latency(min, max, avg, 99%) = "
-                    "{latency_min}, {latency_max}, {latency_avg}, {latency_percentile} (sec)".format(
-                        numbermsgs=stats_periodic.get_total_count(),
-                        latency_min=stats_periodic.get_value_at_percentile(0),
-                        latency_max=stats_periodic.get_value_at_percentile(100),
-                        latency_avg=stats_periodic.get_mean_value(),
-                        latency_percentile=stats_periodic.get_value_at_percentile(99)))
-                print(
-                    "{numbermsgs} messages received in overall, latency(min, max, avg, 99%) = "
-                    "{latency_min}, {latency_max}, {latency_avg}, {latency_percentile} (sec)".format(
-                        numbermsgs=stats_all.get_total_count(),
-                        latency_min=stats_all.get_value_at_percentile(0),
-                        latency_max=stats_all.get_value_at_percentile(100),
-                        latency_avg=stats_all.get_mean_value(),
-                        latency_percentile=stats_all.get_value_at_percentile(99)))
-                stats_periodic.reset()
-            else:
-                print("Illegal message type: " + msg_value.get('type', ''))
-        elif msg.topic() != TOPIC_SUMMARY_MARKERS:
-            # do nothing with TOPIC_SUMMARY_MARKERS at this level but report if unknown topic emerges
-            print("Shouldn't be possible to get message on topic {topic}" + msg.topic())
+            if msg.topic() == TOPIC_FAST_MESSAGES:
+                # the send time is encoded in side the message
+                if msg_value.get('type', '') == "test":
+                    latency = float("%.3f" % time.time()) - msg_value.get('t', 0)
+                    stats_periodic.record_value(latency)
+                    stats_all.record_value(latency)
+                elif msg_value.get('type', '') == "marker":
+                    # whenever we get a marker message, we should dump out the stats
+                    # note that the number of fast messages won't necessarily be quite constant
+                    print(
+                        "{numbermsgs} messages received in period, latency(min, max, avg, 99%) = "
+                        "{latency_min}, {latency_max}, {latency_avg}, {latency_percentile} (sec)".format(
+                            numbermsgs=stats_periodic.get_total_count(),
+                            latency_min=stats_periodic.get_value_at_percentile(0),
+                            latency_max=stats_periodic.get_value_at_percentile(100),
+                            latency_avg=stats_periodic.get_mean_value(),
+                            latency_percentile=stats_periodic.get_value_at_percentile(99)))
+                    print(
+                        "{numbermsgs} messages received in overall, latency(min, max, avg, 99%) = "
+                        "{latency_min}, {latency_max}, {latency_avg}, {latency_percentile} (sec)".format(
+                            numbermsgs=stats_all.get_total_count(),
+                            latency_min=stats_all.get_value_at_percentile(0),
+                            latency_max=stats_all.get_value_at_percentile(100),
+                            latency_avg=stats_all.get_mean_value(),
+                            latency_percentile=stats_all.get_value_at_percentile(99)))
+                    stats_periodic.reset()
+                else:
+                    print("Illegal message type: " + msg_value.get('type', ''))
+            elif msg.topic() != TOPIC_SUMMARY_MARKERS:
+                # do nothing with TOPIC_SUMMARY_MARKERS at this level but report if unknown topic emerges
+                print("Shouldn't be possible to get message on topic {topic}" + msg.topic())
 
-    elif msg.error().code() != KafkaError._PARTITION_EOF:
-        print(msg.error())
-        running = False
+        elif msg.error().code() != KafkaError._PARTITION_EOF:
+            print(msg.error())
+            running = False
 
-close_consumer()
+except KeyboardInterrupt:
+    print("You pressed Ctrl+C. Closing Consumer gracefully.")
+
+c.close()
+print("Done!")
