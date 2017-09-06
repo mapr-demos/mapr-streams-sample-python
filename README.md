@@ -152,8 +152,8 @@ $ maprcli stream delete -path /sample-stream
 
 ## From Apache Kafka to MapR Streams
 
-1. The topics have move from `"fast-messages"` to `"/sample-stream:fast-messages"` and `"summary-markers"` to `"/sample-stream:summary-markers"`
-2. The [producer](http://maprdocs.mapr.com/51/index.html#MapR_Streams/configuration_parameters_for_producers.html) and [consumer](http://maprdocs.mapr.com/51/index.html#MapR_Streams/configuration_parameters_for_consumers.html) configuration parameters that are not used by MapR Streams are automatically ignored
+1. The topics have moved from `"fast-messages"` to `"/sample-stream:fast-messages"` and `"summary-markers"` to `"/sample-stream:summary-markers"`
+2. The [producer](http://maprdocs.mapr.com/52/index.html#MapR_Streams/configuration_parameters_for_producers.html) and [consumer](http://maprdocs.mapr.com/52/index.html#MapR_Streams/configuration_parameters_for_consumers.html) configuration parameters that are not used by MapR Streams are automatically ignored
 3. The producer and Consumer applications are executed with the dependencies of a MapR Client not Apache Kafka.
 
 That's it!
