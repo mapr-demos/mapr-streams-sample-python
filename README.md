@@ -3,7 +3,7 @@
 This project provides a simple but realistic example of a Kafka
 producer and consumer compatible with MapR Streams while using Python.
 
-This project is a copy of the [Java MapR Sample Programs for MapR Streams](https://github.com/mapr-demos/mapr-streams-sample-programs).
+This project is a Python version of the [Java MapR Sample Programs for MapR Streams](https://github.com/mapr-demos/mapr-streams-sample-programs).
 
 The application logic is slightly different since this is in Python instead of Java, but the conceptual logic is still the same.
 
@@ -17,7 +17,7 @@ The application logic is slightly different since this is in Python instead of J
     $ python3.6 -m venv --system-site-packages ~/maprstreams
     $ source ~/maprstreams/bin/activate
     ```
-4. Install the **mapr-client** package per [the instructions for your operating system](http://maprdocs.mapr.com/home/AdvancedInstallation/SettingUptheClient-redhat.html)
+4. Install the **mapr-client** package per [the instructions for your operating system](http://maprdocs.mapr.com/home/AdvancedInstallation/SettingUptheClient-install-mapr-client.html)
 5. Install the **mapr-librdkafka** package per [the instructions for your operating system](http://maprdocs.mapr.com/home/AdvancedInstallation/InstallingStreamsCClient.html)
     1. Ensure you set the **DYLD_LIBRARY_PATH** or **LD_LIBRARY_PATH** in the ```activate``` script of your virtualenv per the instructions for [Configuring the MapR Streams C Client](http://maprdocs.mapr.com/home/MapR_Streams/MapRStreamCAPISetup.html#task_qxg_h2m_3z)
     * **NOTE for OS X users only:** Setting this environment variable will only work in your virtualenv on Mac OS X; it will not be recognized from your .bash_profile due to OS X's security policy or from PyCharm.
@@ -34,7 +34,14 @@ The application logic is slightly different since this is in Python instead of J
     $ cd <directory_of_this_example_programs_files>
     $ pip3 install -r requirements.txt --user
     ```
+## Dependencies
 
+You will also need these Python modules which will be installed from the ```requirements.txt``` file:
+```
+future==0.16.0
+hdrhistogram==0.5.2
+mapr-streams-python==0.9.2
+```
 ## Step 1: Create the stream
 
 A *stream* is a collection of topics that you can manage together for security, default number or partitions, and time to leave for the messages.
