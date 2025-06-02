@@ -1,27 +1,27 @@
-# Sample Programs for MapR Streams in Python
+# Sample Programs for HPE Data Fabric Streams in Python
 
 This project provides a simple but realistic example of a Kafka
-producer and consumer compatible with MapR Streams while using Python.
+producer and consumer compatible with HPE Data Fabric Streams while using Python.
 
-This project is a Python version of the [Java MapR Sample Programs for MapR Streams](https://github.com/mapr-demos/mapr-streams-sample-programs).
+This project is a Python version of the [Java Sample Programs for HPE Data Fabric Streams](https://github.com/mapr-demos/mapr-streams-sample-programs).
 
 The application logic is slightly different since this is in Python instead of Java, but the conceptual logic is still the same.
 
 
 ## Prerequisites
-1. To start, you need to get a **MapR 5.2** running. You can install your [own cluster](https://mapr.com/download/) or [download a sandbox](https://mapr.com/products/mapr-sandbox-hadoop/download/).
-    * **NOTE**: In this example, we used the MapR 5.2 Sandbox via VirtualBox.
-2. Your MapR test node or local machine running these Python scripts must have **Python 3.6**
+1. To start, you need to get a **HPE Data Fabric 7.10 with EEP 9.4.0** running. You can install your [own cluster](https://docs.ezmeral.hpe.com/datafabric-customer-managed/home/install.html) or [download a sandbox](https://docs.ezmeral.hpe.com/datafabric-customer-managed/home/MapRContainerDevelopers/RunMapRContainerDevelopers.html?hl=sandbox).
+    * **NOTE**: In this example, we used the HPE Data Fabric 7.10 with EEP 9.4.0 cluster.
+2. Your HPE Data Fabric test node or local machine running these Python scripts must have **Python 3.11**. The mapr-streams-python version 2.6.0 is qualified on python versions 3.7 to 3.12. We are using python version 3.11 as an example here.
 3. Create and activate a Python **virtualenv** in either Mac OS X or Linux
     ```
-    $ python3.6 -m venv --system-site-packages ~/maprstreams
+    $ python3.11 -m venv --system-site-packages ~/maprstreams
     $ source ~/maprstreams/bin/activate
     ```
-4. Install the **mapr-client** package per [the instructions for your operating system](http://maprdocs.mapr.com/home/AdvancedInstallation/SettingUptheClient-install-mapr-client.html)
-5. Install the **mapr-librdkafka** package per [the instructions for your operating system](http://maprdocs.mapr.com/home/AdvancedInstallation/InstallingStreamsCClient.html)
-    1. Ensure you set the **DYLD_LIBRARY_PATH** or **LD_LIBRARY_PATH** in the ```activate``` script of your virtualenv per the instructions for [Configuring the MapR Streams C Client](http://maprdocs.mapr.com/home/MapR_Streams/MapRStreamCAPISetup.html#task_qxg_h2m_3z)
+4. Install the **mapr-client** package per [the instructions for your operating system](https://docs.ezmeral.hpe.com/datafabric-customer-managed/home/AdvancedInstallation/SettingUptheClient-mapr-client.html ) 
+5. Install the **mapr-librdkafka** package per [the instructions for your operating system](https://docs.ezmeral.hpe.com/datafabric-customer-managed/home/AdvancedInstallation/InstallingStreamsCClient.html )
+    1. Ensure you set the **DYLD_LIBRARY_PATH** or **LD_LIBRARY_PATH** in the ```activate``` script of your virtualenv per the instructions for [Configuring the HPE Data Fabric Streams C Client](https://docs.ezmeral.hpe.com/datafabric-customer-managed/home/MapR_Streams/MapRStreamCAPISetup.html#task_qxg_h2m_3z)
     * **NOTE for OS X users only:** Setting this environment variable will only work in your virtualenv on Mac OS X; it will not be recognized from your .bash_profile due to OS X's security policy or from PyCharm.
-6. For Mac OS X or Linux users, install the [MapR Python client](http://maprdocs.mapr.com/home/AdvancedInstallation/InstallingStreamsPYClient.html) per below:
+6. For Mac OS X or Linux users, install the [HPE Data Fabric Streams Python client](https://docs.ezmeral.hpe.com/datafabric-customer-managed/home/AdvancedInstallation/InstallingStreamsPYClient.html ) per below:
     ```
     $ source ~/maprstreams/bin/activate
     $ pip3 install mapr-streams-python --user
@@ -40,13 +40,13 @@ You will also need these Python modules which will be installed from the ```requ
 ```
 future==0.16.0
 hdrhistogram==0.5.2
-mapr-streams-python==0.9.2
+mapr-streams-python==2.6.0
 ```
 ## Step 1: Create the stream
 
 A *stream* is a collection of topics that you can manage together for security, default number or partitions, and time to leave for the messages.
 
-Run the following command on your MapR cluster:
+Run the following command on your HPE Data Fabric cluster:
 
 ```
 $ maprcli stream create -path /sample-stream
@@ -100,7 +100,7 @@ Sent 1 messages this round out of 10020 sent so far
 Sent 3 messages this round out of 10023 sent so far
 ```
 
-The only important difference here between an Apache Kafka application and MapR Streams application is that the client libraries are different. This causes the MapR Producer to connect to the MapR cluster to post the messages, and not to a Kafka broker.
+The only important difference here between an Apache Kafka application and HPE Data Fabric Streams application is that the client libraries are different. This causes the HPE Data Fabric Streams Python Producer to connect to the HPE Data Fabric cluster to post the messages, and not to a Kafka broker.
 
 
 ## Step 4: Start the example consumer
@@ -150,15 +150,15 @@ $ maprcli stream delete -path /sample-stream
 
 
 
-## From Apache Kafka to MapR Streams
+## From Apache Kafka to HPE Data Fabric Streams
 
 1. The topics have moved from `"fast-messages"` to `"/sample-stream:fast-messages"` and `"summary-markers"` to `"/sample-stream:summary-markers"`
-2. The [producer](http://maprdocs.mapr.com/52/index.html#MapR_Streams/configuration_parameters_for_producers.html) and [consumer](http://maprdocs.mapr.com/52/index.html#MapR_Streams/configuration_parameters_for_consumers.html) configuration parameters that are not used by MapR Streams are automatically ignored
-3. The producer and Consumer applications are executed with the dependencies of a MapR Client not Apache Kafka.
+2. The [producer](http://maprdocs.mapr.com/52/index.html#MapR_Streams/configuration_parameters_for_producers.html) and [consumer](http://maprdocs.mapr.com/52/index.html#MapR_Streams/configuration_parameters_for_consumers.html) configuration parameters that are not used by HPE Data Fabric Streams are automatically ignored
+3. The producer and Consumer applications are executed with the dependencies of a HPE Data Fabric Client not Apache Kafka.
 
 That's it!
 
 
 ## Credits
 Note that this example was derived in part from the documentation provided by the Apache Kafka project. We have 
-added short, realistic sample programs that illustrate how real programs are written using MapR Streams.
+added short, realistic sample programs that illustrate how real programs are written using HPE Data Fabric Streams.

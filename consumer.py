@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from mapr_streams_python import Consumer, KafkaError
+from confluent_kafka import Consumer, KafkaError
 import json
 import time
 from hdrh.histogram import HdrHistogram

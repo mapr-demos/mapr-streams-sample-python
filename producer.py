@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from mapr_streams_python import Producer
+from confuent_kafka import Producer
 import traceback
 import sys
 import json
